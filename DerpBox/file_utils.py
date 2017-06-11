@@ -31,11 +31,11 @@ def create_file_obj(id, root_path, path):
 def get_paths_recursive(root_path):
     paths = []
     for root, dirs, files in os.walk(root_path):
-        for d in dirs:
-            path = os.path.relpath(os.path.join(root, d), root_path)
-            paths.append(path.replace('\\', '/'))
         for f in files:
             path = os.path.relpath(os.path.join(root, f), root_path)
+            paths.append(path.replace('\\', '/'))
+        for d in dirs:
+            path = os.path.relpath(os.path.join(root, d), root_path)
             paths.append(path.replace('\\', '/'))
 
     return paths

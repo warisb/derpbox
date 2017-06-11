@@ -9,26 +9,8 @@ import base64
 import os
 import errno
 
-import argparse
-import sys
-
 __author__ = "Waris Boonyasiriwat"
 __copyright__ = "Copyright 2017"
-
-parser = argparse.ArgumentParser(description='Derpbox Client which '
-                                             'communicates with the agent to '
-                                            'synchronize local files with the agent')
-parser.add_argument(
-    'sync_path',
-    help='File path which client will synchronize')
-
-parser.add_argument(
-    'agent_hostname',
-    help='The hostname or IP of the agent')
-
-args = parser.parse_args()
-root_path = os.path.abspath(args.sync_path).replace('\\', '/')
-derpbox_root_dir = root_path if root_path.endswith('/') else root_path + '/'
 
 class DerpboxClient:
     def __init__(self, root_dir, master_host, master_port=5000):
@@ -41,6 +23,12 @@ class DerpboxClient:
         self.master_host = master_host
         self.master_port = master_port
         self.root_dir = root_dir
+
+    def push(self):
+        request_url = "http://%s:%d/derpbox/api/sync_with_client" % (self.master_host, self.master_port)
+        requests.put(request_url, data={'port': self.master_port})
+
+        print("Push completed")
 
     def sync(self):
         # Get own file list
@@ -141,15 +129,3 @@ class DerpboxClient:
                         f.truncate()
                         f.write(data)
                         f.close()
-
-if __name__ == '__main__':
-    response = raw_input(
-        'Are you sure you want to sync %s to agent on %s [Yes/n]: ' %
-            (derpbox_root_dir, args.agent_hostname))
-
-    if response != 'Yes':
-        print("Aborting sync")
-        exit(0)
-
-    derpbox_client = DerpboxClient(derpbox_root_dir, args.agent_hostname)
-    derpbox_client.sync()
