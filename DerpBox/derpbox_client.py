@@ -10,6 +10,7 @@ import os
 import errno
 
 import argparse
+import sys
 
 __author__ = "Waris Boonyasiriwat"
 __copyright__ = "Copyright 2017"
@@ -26,7 +27,7 @@ parser.add_argument(
     help='The hostname or IP of the agent')
 
 args = parser.parse_args()
-root_path = args.sync_path.replace('\\', '/')
+root_path = os.path.abspath(args.sync_path).replace('\\', '/')
 derpbox_root_dir = root_path if root_path.endswith('/') else root_path + '/'
 
 class DerpboxClient:

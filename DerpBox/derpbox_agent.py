@@ -20,7 +20,7 @@ parser.add_argument(
     help='File path with which the agent will be bound')
 args = parser.parse_args()
 
-root_path = args.root_path.replace('\\', '/')
+root_path = os.path.abspath(args.root_path).replace('\\', '/')
 derpbox_root_dir = root_path if root_path.endswith('/') else root_path + '/'
 
 app = Flask(__name__)
