@@ -9,10 +9,25 @@ import base64
 import os
 import errno
 
+import argparse
+
 __author__ = "Waris Boonyasiriwat"
 __copyright__ = "Copyright 2017"
 
-derpbox_root_dir = "C:\\Users\\Waris\\derpbox_sandbox_client\\"  # Make this an input later
+parser = argparse.ArgumentParser(description='Derpbox Client which '
+                                             'communicates with the agent to '
+                                            'synchronize local files with the agent')
+parser.add_argument(
+    'sync_path',
+    help='File path which client will synchronize')
+
+parser.add_argument(
+    'agent_hostname',
+    help='The hostname or IP of the agent')
+
+args = parser.parse_args()
+root_path = args.sync_path.replace('\\', '/')
+derpbox_root_dir = root_path if root_path.endswith('/') else root_path + '/'
 
 class DerpboxClient:
     def __init__(self, root_dir, master_host, master_port=5000):
@@ -127,5 +142,13 @@ class DerpboxClient:
                         f.close()
 
 if __name__ == '__main__':
-    derpbox_client = DerpboxClient(derpbox_root_dir, "localhost")
+    response = raw_input(
+        'Are you sure you want to sync %s to agent on %s [Yes/n]: ' %
+            (derpbox_root_dir, args.agent_hostname))
+
+    if response != 'Yes':
+        print("Aborting sync")
+        exit(0)
+
+    derpbox_client = DerpboxClient(derpbox_root_dir, args.agent_hostname)
     derpbox_client.sync()

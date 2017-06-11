@@ -9,8 +9,19 @@ from flask import Flask, jsonify, abort
 import os
 import file_utils
 import base64
+import argparse
 
-derpbox_root_dir = "C:\\Users\\Waris\\derpbox_sandbox\\"  # Make this an input later
+parser = argparse.ArgumentParser(description='Derpbox Agent which '
+                                             'provides necessary services '
+                                             'for Derpbox Clients such as file list'
+                                             'or file downloads')
+parser.add_argument(
+    'root_path',
+    help='File path with which the agent will be bound')
+args = parser.parse_args()
+
+root_path = args.root_path.replace('\\', '/')
+derpbox_root_dir = root_path if root_path.endswith('/') else root_path + '/'
 
 app = Flask(__name__)
 
