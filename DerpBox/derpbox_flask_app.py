@@ -141,17 +141,19 @@ def update_sync_time_file():
 def get_last_modified():
     lock.acquire()
 
-    try:
-        time = get_last_modified_time()
-    except (OSError, IOError) as e:
-        time = 0.0
+    time = get_last_modified_time()
+
     lock.release()
 
     return jsonify({'lastModified': time})
 
 
 def get_last_modified_time():
-    f = open(app_data.mod_time_path, "r")
-    time = f.read()
-    f.close()
+    try:
+        f = open(app_data.mod_time_path, "r")
+        time = f.read()
+        f.close()
+    except (OSError, IOError):
+        time = 0.0
+        pass
     return float(time)
