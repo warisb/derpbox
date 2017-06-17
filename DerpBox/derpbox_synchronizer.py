@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-"""derpbox_client.py: the slave process used to sync localhost against any specified master"""
+"""derpbox_synchronizer.py: the slave process used to sync localhost against any specified master"""
+import shutil
 
 import requests
 import file_utils
@@ -12,8 +13,8 @@ import errno
 __author__ = "Waris Boonyasiriwat"
 __copyright__ = "Copyright 2017"
 
-class DerpboxClient:
-    def __init__(self, root_dir, master_host, master_port=5000):
+class DerpboxSynchronizer:
+    def __init__(self, root_dir, master_host, client_port=5000, master_port=5000):
         """
         Client for synchronizing localhost with the master_host
         :param master_host: ip address of the master to sync to
@@ -23,10 +24,11 @@ class DerpboxClient:
         self.master_host = master_host
         self.master_port = master_port
         self.root_dir = root_dir
+        self.client_port = client_port
 
     def push(self):
-        request_url = "http://%s:%d/derpbox/api/sync_with_client" % (self.master_host, self.master_port)
-        requests.put(request_url, data={'port': self.master_port})
+        request_url = "http://%s:%d/derpbox/api/sync_with_caller" % (self.master_host, int(self.master_port))
+        requests.put(request_url, json={'port': self.client_port})
 
         print("Push completed")
 
@@ -35,7 +37,7 @@ class DerpboxClient:
         local_list = file_utils.get_paths_recursive(self.root_dir)
 
         # Get master file list
-        request_url = "http://%s:%d/derpbox/api/files" % (self.master_host, self.master_port)
+        request_url = "http://%s:%d/derpbox/api/files" % (self.master_host, int(self.master_port))
         response = requests.get(request_url)
         master_files = json.loads(response.text)
 
@@ -73,7 +75,7 @@ class DerpboxClient:
         return False
 
     def __download_file(self, file_id):
-        request_url = "http://%s:%d/derpbox/api/files/%d" % (self.master_host, self.master_port, file_id)
+        request_url = "http://%s:%d/derpbox/api/files/%d" % (self.master_host, int(self.master_port), int(file_id))
         response = requests.get(request_url)
         file_obj = json.loads(response.text)
 
@@ -85,10 +87,13 @@ class DerpboxClient:
                 # Master deleted, local should delete too
                 print("Removing file %s (master deleted)" % f)
                 realpath = self.root_dir + f
-                if os.path.isdir(realpath):
-                    os.rmdir(realpath)
-                else:
-                    os.remove(realpath)
+                try:
+                    if os.path.isdir(realpath):
+                        shutil.rmtree(realpath)
+                    else:
+                        os.remove(realpath)
+                except WindowsError:
+                    print("Coudln't delete %s" % realpath)
 
     def __process_dirs_added(self, local_list, master_files_json):
         for master_file in master_files_json:
