@@ -19,10 +19,10 @@ import datetime
 __author__ = "Waris Boonyasiriwat"
 __copyright__ = "Copyright 2017 by Waris Boonyasiriwat"
 
-parser = argparse.ArgumentParser(description='Derpbox Agent which '
-                                             'provides necessary services '
-                                             'for Derpbox Clients such as file list'
-                                             'or file downloads')
+parser = argparse.ArgumentParser(description=
+                                 'Derpbox Agent which runs a background task for either a client or master'
+                                 ' to sync a monitored directory with a specified master (if client) or'
+                                 ' to wait for clients to push changes to it (if master)')
 parser.add_argument(
     'rootpath',
     help='File path with which the agent will be bound')
