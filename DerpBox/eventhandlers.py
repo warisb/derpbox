@@ -12,21 +12,18 @@ class MasterChangeHandler(FileSystemEventHandler):
         self.fn_updatesynctime = fn_updatesynctime
 
     def on_any_event(self, event):
-        print "Detected changes, updating sync time"
         self.fn_updatesynctime()
 
 
 class DirChangeHandler(FileSystemEventHandler):
     def __init__(self, fnpush):
-        self.enabled = True
         self.fnpush = fnpush
+        self.enabled = True
 
-    def enable(self, en):
-        self.enabled = en
+    def enable(self, enabled):
+        self.enabled = enabled
 
     def on_any_event(self, event):
         if not self.enabled:
             return
-
-        print "Detected changes, pushing to server"
         self.fnpush()

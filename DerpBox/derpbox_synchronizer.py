@@ -85,7 +85,7 @@ class DerpboxSynchronizer:
         for f in local_list:
             if self.__find_file_in_master(f, master_files_json) is None:
                 # Master deleted, local should delete too
-                print("Removing file %s (master deleted)" % f)
+                print("Removing file %s (remote deleted)" % f)
                 realpath = self.root_dir + f
                 try:
                     if os.path.isdir(realpath):
@@ -101,7 +101,7 @@ class DerpboxSynchronizer:
                 if not self.__same_dir_exists_in_local(master_file['path'], local_list):
                     # Directory exists in master but not local
                     thepath = master_file['path']
-                    print("Creaing directory %s (master created)" % thepath)
+                    print("Creaing directory %s (remote created)" % thepath)
                     os.makedirs(self.root_dir + thepath)
 
     @staticmethod
@@ -127,8 +127,8 @@ class DerpboxSynchronizer:
 
                         real_path = self.root_dir + master_file['path']
                         print(
-                            ("Adding file %s (master added)" if not os.path.exists(real_path) else
-                            "Replacing file %s (master modified)") % master_file['path'])
+                            ("Adding file %s (remote added)" if not os.path.exists(real_path) else
+                            "Replacing file %s (remote modified)") % master_file['path'])
 
                         f = self.__open_file_recursive_makedirs(real_path)
                         f.truncate()
